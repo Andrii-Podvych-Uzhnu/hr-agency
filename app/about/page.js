@@ -2,18 +2,8 @@ import Link from 'next/link';
 
 export default function About() {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-  
-      <nav className="py-6 border-b">
-        <div className="container mx-auto px-4">
-          <Link href="/" className="text-indigo-600 font-bold text-xl tracking-tight">
-            HR-Agency
-          </Link>
-        </div>
-      </nav>
-
-      <main className="flex-grow">
-     
+    <div className="bg-white">
+      <main>
         <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4 max-w-4xl text-center">
             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
@@ -27,7 +17,6 @@ export default function About() {
           </div>
         </section>
 
-      
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -62,26 +51,15 @@ export default function About() {
           </div>
         </section>
 
-
         <section className="py-20 bg-indigo-900 text-white text-center">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold mb-8">Готові зробити наступний крок?</h2>
-            <Link href="/" className="bg-white text-indigo-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg">
+            <Link href="/vacancies" className="bg-white text-indigo-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg">
               Переглянути вакансії
             </Link>
           </div>
         </section>
       </main>
-
-      <footer className="bg-gray-900 text-white py-10 border-t border-gray-800">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-400 mb-2">© 2026 HR-Agency. Всі права захищені.</p>
-          <div className="flex justify-center gap-6 mt-4 text-sm text-gray-500">
-            <a href="#" className="hover:text-white transition">Політика конфіденційності</a>
-            <a href="#" className="hover:text-white transition">Умови використання</a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
