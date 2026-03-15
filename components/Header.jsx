@@ -10,7 +10,14 @@ export default function Header() {
         <nav className="flex items-center gap-6">
           <Link href="/" className="text-sm font-medium text-slate-700 hover:text-indigo-600 transition">Головна</Link>
           <Link href="/vacancies" className="text-sm font-medium text-slate-700 hover:text-indigo-600 transition">Вакансії</Link>
+          <Link href="/candidates" className="text-sm font-medium text-slate-700 hover:text-indigo-600 transition">Кандидати</Link>
           <Link href="/about" className="text-sm font-medium text-slate-700 hover:text-indigo-600 transition">Про нас</Link>
+          
+          
+          <Link href="/dashboard" className="text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl hover:bg-indigo-100 transition-colors">
+            Дашборд
+          </Link>
+          
           <button className="bg-indigo-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-indigo-700 transition">Увійти</button>
         </nav>
       </div>

@@ -1,20 +1,29 @@
-export default function VacancyCard({ title, company, salary, type, category, available = true }) {
+import Link from 'next/link';
+import FavoriteButton from './FavoriteButton';
+
+export default function VacancyCard({ id, title, company, salary, type, category, available }) {
   return (
-    <div className={`bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 ${!available ? 'opacity-50 grayscale' : ''}`}>
-      <div className="flex justify-between items-start mb-4">
-        <h3 className="text-xl font-bold text-slate-900">{title}</h3>
-        <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded ${available ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-          {available ? 'Активна' : 'Закрита'}
-        </span>
+    <div className={`bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 ${!available ? 'opacity-60 grayscale' : ''}`}>
+      <div className="flex justify-between items-start mb-6">
+        <div>
+          <h3 className="text-xl font-bold text-slate-900 mb-1">{title}</h3>
+          <p className="text-indigo-600 font-bold">{company}</p>
+        </div>
+        
+        <FavoriteButton vacancyId={id} />
       </div>
-      <p className="text-indigo-600 font-semibold mb-2">{company}</p>
-      <div className="flex flex-wrap gap-2 mb-6">
-        <span className="text-xs bg-slate-100 px-2 py-1 rounded text-slate-600">{type}</span>
-        <span className="text-xs bg-indigo-50 px-2 py-1 rounded text-indigo-600">{category}</span>
+
+      <div className="flex gap-2 mb-8">
+        <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-xs font-bold">{type}</span>
+        <span className="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-xs font-bold">{category}</span>
+        {available && <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold">Активна</span>}
       </div>
-      <div className="flex justify-between items-center border-t pt-4">
-        <span className="text-lg font-bold text-slate-950">{salary} грн</span>
-        <button disabled={!available} className="text-sm font-bold text-indigo-600 hover:text-indigo-800 disabled:text-slate-400">Відгукнутися →</button>
+
+      <div className="flex justify-between items-center mt-auto border-t border-slate-100 pt-6">
+        <span className="text-2xl font-black text-slate-900">{salary} <span className="text-sm text-slate-400 font-medium">грн</span></span>
+        <Link href={`/vacancies/${id}`} className="text-indigo-600 font-bold hover:text-indigo-800 transition-colors">
+          Відгукнутися →
+        </Link>
       </div>
     </div>
   );
