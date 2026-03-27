@@ -1,37 +1,38 @@
 'use client'
-import { useState } from 'react'
 
-export default function VacancyActions({ vacancyId }) {
-  const [showConfirm, setShowConfirm] = useState(false)
+import { useRouter } from 'next/navigation'
 
-  const handleDelete = () => {
-    console.log(`Видалення вакансії ${vacancyId}...`)
-   
-    setShowConfirm(false)
-    alert('Вакансію успішно видалено (імітація)!')
-  }
+export default function VacancyActions({ vacancyId, vacancyTitle }) {
+  const router = useRouter()
 
-  if (showConfirm) {
-    return (
-      <div className="flex items-center gap-3 bg-red-50 p-3 rounded-xl border border-red-100">
-        <span className="text-red-700 font-bold text-sm">Точно видалити?</span>
-        <button onClick={handleDelete} className="bg-red-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-red-700 transition">
-          Так
-        </button>
-        <button onClick={() => setShowConfirm(false)} className="bg-slate-200 text-slate-700 px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-slate-300 transition">
-          Ні
-        </button>
-      </div>
-    )
+  async function handleDelete() {
+    if (!confirm(`Ви впевнені, що хочете видалити вакансію "${vacancyTitle}"?`)) return
+
+    try {
+      const response = await fetch(`/api/vacancies/${vacancyId}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        throw new Error('Помилка видалення')
+      }
+
+      
+      router.push('/dashboard/vacancies')
+      
+      router.refresh()
+    } catch (err) {
+      alert(err.message)
+    }
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <button className="bg-slate-100 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-200 transition">
-        Редагувати
-      </button>
-      <button onClick={() => setShowConfirm(true)} className="bg-red-100 text-red-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-200 transition">
-        Видалити
+    <div className="flex gap-4">
+      <button
+        onClick={handleDelete}
+        className="bg-red-500 text-white px-6 py-3 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-red-600 transition-all shadow-lg shadow-red-100"
+      >
+        Видалити вакансію
       </button>
     </div>
   )
