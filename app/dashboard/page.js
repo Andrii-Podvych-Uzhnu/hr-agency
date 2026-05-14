@@ -1,42 +1,111 @@
-import { Suspense } from 'react'
-import StatsCard from "@/components/StatsCard"
-import { getVacancyStats } from "@/lib/helpers"
-import { StatsSkeleton } from '@/components/skeletons/PostSkeleton'
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import StatsCard from "@/components/StatsCard";
+import { getVacancyStats, getApplicationStats } from "@/lib/helpers";
 
 export const metadata = {
-  title: "Дашборд | HR.agency",
-}
+  title: "Панель керування | HR.agency",
+};
 
-async function DashboardStats() {
-  await new Promise(resolve => setTimeout(resolve, 1500))
-  const stats = await getVacancyStats() 
+export default async function DashboardPage() {
+  const session = await getServerSession(authOptions);
+  const isAdmin = session?.user?.role === "admin";
+
+  
+  const [vacancyStats, appStats] = await Promise.all([
+    getVacancyStats(),
+    isAdmin ? getApplicationStats() : Promise.resolve(null),
+  ]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <StatsCard title="Всього вакансій" value={stats.total} type="slate" />
-      <StatsCard title="Активні" value={stats.available} type="emerald" />
-      <StatsCard title="Категорії" value={stats.categoriesCount} type="blue" />
-      <StatsCard title="Сер. зарплата" value={`${stats.avgSalary} ₴`} type="indigo" />
-    </div>
-  )
-}
+    <div className="space-y-10">
+      <div>
+        <h1 className="text-4xl font-black text-slate-900 mb-2">
+          Привіт, {session?.user?.name || "користувачу"}! 👋
+        </h1>
+        <p className="text-slate-500">
+          Ось короткий огляд активності в системі на сьогодні.
+        </p>
+      </div>
 
-export default function DashboardPage() {
-  return (
-    <div className="max-w-6xl mx-auto">
-      <h1 className="text-4xl font-black text-slate-900 mb-2">Огляд платформи</h1>
-      <p className="text-slate-500 mb-10 text-lg">Статистика активності HR.agency</p>
       
-      <Suspense fallback={
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsSkeleton />
-          <StatsSkeleton />
-          <StatsSkeleton />
-          <StatsSkeleton />
+      <section>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-2 h-8 bg-indigo-600 rounded-full"></div>
+          <h2 className="text-xl font-bold text-slate-800 uppercase tracking-wider">
+            Ринок вакансій
+          </h2>
         </div>
-      }>
-        <DashboardStats />
-      </Suspense>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <StatsCard 
+            title="Всього вакансій" 
+            value={vacancyStats.total} 
+            color="indigo" 
+          />
+          <StatsCard 
+            title="Актуальні пропозиції" 
+            value={vacancyStats.available} 
+            color="emerald" 
+          />
+          <StatsCard 
+            title="Середня зарплата" 
+            value={`$${vacancyStats.avgSalary}`} 
+            color="blue" 
+          />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <StatsCard 
+            title="Категорій на вибір" 
+            value={vacancyStats.categoriesCount} 
+            color="slate" 
+          />
+          <StatsCard 
+            title="Закриті вакансії" 
+            value={vacancyStats.unavailable} 
+            color="rose" 
+          />
+        </div>
+      </section>
+
+     
+      {isAdmin && appStats && (
+        <section className="pt-6 border-t border-slate-200">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-2 h-8 bg-amber-500 rounded-full"></div>
+            <h2 className="text-xl font-bold text-slate-800 uppercase tracking-wider">
+              Активність рекрутингу (Admin)
+            </h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <StatsCard 
+              title="Всього відгуків" 
+              value={appStats.total} 
+              color="amber" 
+            />
+            <StatsCard 
+              title="Нові (Очікують)" 
+              value={appStats.pending} 
+              color="rose" 
+            />
+            <StatsCard 
+              title="На розгляді / Інтерв'ю" 
+              value={appStats.reviewing} 
+              color="blue" 
+            />
+          </div>
+          
+          <div className="mt-6 bg-amber-50 border border-amber-100 p-4 rounded-2xl flex items-center gap-4 text-amber-800">
+            <span className="text-2xl">💡</span>
+            <p className="text-sm font-medium">
+              У вас є <strong>{appStats.pending}</strong> нових відгуків, які потребують перевірки. 
+              Перейдіть у розділ "Відгуки", щоб обробити їх.
+            </p>
+          </div>
+        </section>
+      )}
     </div>
-  )
+  );
 }
