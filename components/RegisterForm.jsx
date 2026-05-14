@@ -1,149 +1,86 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import Link from "next/link";
+import { registerFormSchema } from "@/lib/validations/auth";
+import FormField from "@/components/forms/FormField";
 
 export default function RegisterForm() {
-  const router = useRouter()
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  })
-  const [error, setError] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const {
+    register, handleSubmit, setError,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(registerFormSchema),
+    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
+  });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError(null)
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Паролі не збігаються')
-      return
-    }
-
-    setIsLoading(true)
-
+  const onSubmit = async (data) => {
     try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
+          name: data.name, email: data.email, password: data.password,
         }),
-      })
+      });
+      const body = await res.json().catch(() => ({}));
 
-      const data = await res.json()
+      if (res.status === 409) {
+        setError("email", { type: "server", message: body.error || "Цей email вже зареєстрований" });
+        toast.error("Email вже зайнятий");
+        return;
+      }
+      if (!res.ok) { toast.error(body.error || "Помилка реєстрації"); return; }
 
-      if (!res.ok) {
-        setError(data.error || 'Помилка реєстрації')
-        setIsLoading(false)
-        return
+      const signInResult = await signIn("credentials", {
+        email: data.email, password: data.password, redirect: false,
+      });
+
+      if (signInResult?.error) {
+        toast.warning("Акаунт створено, тепер увійдіть");
+        router.push("/login");
+        return;
       }
 
-      await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        callbackUrl: '/dashboard'
-      })
-
+      toast.success("Реєстрація успішна!");
+      router.push("/dashboard");
+      router.refresh();
     } catch {
-      setError('Щось пішло не так')
-      setIsLoading(false)
+      toast.error("Помилка реєстрації");
     }
-  }
+  };
 
   return (
-    <div className="max-w-md mx-auto mt-16 px-4">
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-10">
-        <h1 className="text-3xl font-black text-center mb-2 text-slate-900">Реєстрація</h1>
-        <p className="text-slate-500 text-center mb-8">Станьте частиною HR.agency</p>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 text-sm">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-slate-700 font-bold mb-1 text-xs uppercase tracking-wider">Повне ім’я</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500"
-              placeholder="Олександр Коваленко"
-            />
-          </div>
-
-          <div>
-            <label className="block text-slate-700 font-bold mb-1 text-xs uppercase tracking-wider">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500"
-              placeholder="alex@example.com"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-slate-700 font-bold mb-1 text-xs uppercase tracking-wider">Пароль</label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                minLength={6}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500"
-              />
-            </div>
-            <div>
-              <label className="block text-slate-700 font-bold mb-1 text-xs uppercase tracking-wider">Підтвердження</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                minLength={6}
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-indigo-600 text-white py-4 rounded-xl hover:bg-indigo-700 font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-indigo-100 mt-4 disabled:opacity-50"
-          >
-            {isLoading ? 'Створення...' : 'Зареєструватися'}
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
+        <h1 className="text-2xl font-black text-center mb-6 text-slate-900">Реєстрація</h1>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <FormField label="Ім'я" error={errors.name?.message}>
+            <input type="text" {...register("name")} className="w-full px-4 py-2 border rounded-xl" />
+          </FormField>
+          <FormField label="Email" error={errors.email?.message}>
+            <input type="email" {...register("email")} className="w-full px-4 py-2 border rounded-xl" />
+          </FormField>
+          <FormField label="Пароль" error={errors.password?.message}>
+            <input type="password" autoComplete="new-password" {...register("password")} className="w-full px-4 py-2 border rounded-xl" />
+          </FormField>
+          <FormField label="Підтвердження пароля" error={errors.confirmPassword?.message}>
+            <input type="password" autoComplete="new-password" {...register("confirmPassword")} className="w-full px-4 py-2 border rounded-xl" />
+          </FormField>
+          <button type="submit" disabled={isSubmitting}
+            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50 shadow-lg shadow-indigo-100">
+            {isSubmitting ? "Реєстрація..." : "Зареєструватися"}
           </button>
         </form>
-
-        <p className="text-center mt-8 text-slate-600 text-sm">
-          Вже є профіль?{' '}
-          <Link href="/auth/login" className="text-indigo-600 font-bold hover:underline">
-            Увійти
-          </Link>
+        <p className="mt-6 text-center text-sm text-slate-500">
+          Вже маєте акаунт? <Link href="/login" className="text-indigo-600 font-bold hover:underline">Увійти</Link>
         </p>
       </div>
     </div>
-  )
+  );
 }

@@ -2,24 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-export default function RoleToggle({ userId, currentRole, currentUserId }) {
-  const [loading, setLoading] = useState(false);
+export default function RoleToggle({ userId, currentRole }) {
   const router = useRouter();
-
- 
-  if (userId === currentUserId) {
-    return <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">(Ви)</span>;
-  }
-
-  const newRole = currentRole === "admin" ? "user" : "admin";
+  const [loading, setLoading] = useState(false);
 
   const handleToggle = async () => {
-    if (!confirm(`Змінити роль користувача на ${newRole}?`)) return;
+    const newRole = currentRole === "admin" ? "user" : "admin";
     
     setLoading(true);
     try {
-      const response = await fetch(`/api/users/${userId}`, {
+      const response = await fetch(`/api/users/${userId}/role`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: newRole }),
@@ -27,13 +21,13 @@ export default function RoleToggle({ userId, currentRole, currentUserId }) {
 
       if (!response.ok) {
         const data = await response.json();
-        alert(data.error || "Помилка зміни ролі");
-        return;
+        throw new Error(data.error || "Помилка зміни ролі");
       }
 
-      router.refresh(); 
-    } catch (err) {
-      alert("Помилка з'єднання");
+      toast.success(`Роль змінено на: ${newRole}`);
+      router.refresh();
+    } catch (e) {
+      toast.error(e.message);
     } finally {
       setLoading(false);
     }
@@ -43,13 +37,13 @@ export default function RoleToggle({ userId, currentRole, currentUserId }) {
     <button
       onClick={handleToggle}
       disabled={loading}
-      className={`text-[10px] font-bold uppercase tracking-tighter px-3 py-1 rounded-lg transition disabled:opacity-50 ${
-        newRole === "admin" 
-          ? "bg-slate-900 text-white hover:bg-slate-800" 
-          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+      className={`px-3 py-1 rounded-full text-xs font-bold transition-all disabled:opacity-50 ${
+        currentRole === "admin"
+          ? "bg-rose-100 text-rose-700 hover:bg-rose-200"
+          : "bg-slate-100 text-slate-700 hover:bg-slate-200"
       }`}
     >
-      {loading ? "..." : `Зробити ${newRole}`}
+      {loading ? "..." : currentRole === "admin" ? "Зробити юзером" : "Зробити адміном"}
     </button>
   );
 }
