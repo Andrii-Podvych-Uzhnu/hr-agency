@@ -1,54 +1,30 @@
-import dbConnect from '@/lib/db';
-import Vacancy from '@/lib/models/Vacancy';
+import dbConnect from "@/lib/db";
+import Vacancy from "@/lib/models/Vacancy"; 
+import { authorize } from "@/lib/authorize"; 
 
 
-export async function GET(request) {
- 
+export async function GET() {
   await dbConnect();
-
-  const { searchParams } = new URL(request.url);
-  const category = searchParams.get('category');
-  const search = searchParams.get('search');
-
-  
-  const filter = {};
-  if (category) {
-    filter.category = category;
+  try {
+    const vacancies = await Vacancy.find({}).sort({ createdAt: -1 });
+    return Response.json(vacancies);
+  } catch (err) {
+    return Response.json({ error: "Помилка отримання даних" }, { status: 500 });
   }
-  if (search) {
-    
-    filter.title = { $regex: search, $options: 'i' };
-  }
-
-  
-  const vacancies = await Vacancy.find(filter).sort({ createdAt: -1 });
-
-  
-  return Response.json(vacancies);
 }
 
 
 export async function POST(request) {
+  
+  const { error } = await authorize("admin");
+  if (error) return error; 
+
   await dbConnect();
-
   try {
-    const body = await request.json();
-    
-    
-    const vacancy = await Vacancy.create(body);
-
+    const data = await request.json();
+    const vacancy = await Vacancy.create(data);
     return Response.json(vacancy, { status: 201 });
-  } catch (error) {
-    
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
-     
-      return Response.json({ error: messages.join(', ') }, { status: 400 });
-    }
-
-    return Response.json(
-      { error: 'Помилка сервера' },
-      { status: 500 }
-    );
+  } catch (err) {
+    return Response.json({ error: "Помилка створення вакансії" }, { status: 400 });
   }
 }

@@ -51,10 +51,22 @@ export default function Header() {
             <span className="text-slate-400 text-sm">...</span>
           ) : session ? (
             <div className="flex items-center gap-4">
-              <Link href="/dashboard"
-                className="text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl hover:bg-indigo-100 transition">
-                {session.user.name}
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link href="/dashboard"
+                  className="text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl hover:bg-indigo-100 transition">
+                  {session.user.name}
+                </Link>
+                
+                {/* ТИЖДЕНЬ 9: Badge ролі користувача */}
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter ${
+                  session.user.role === 'admin'
+                    ? 'bg-rose-500 text-white' // Червоний для адміна
+                    : 'bg-slate-100 text-slate-600' // Сірий для юзера
+                }`}>
+                  {session.user.role}
+                </span>
+              </div>
+
               <button
                 onClick={() => signOut({ callbackUrl: '/' })}
                 className="bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-slate-800 transition"

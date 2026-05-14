@@ -1,62 +1,34 @@
-import dbConnect from '@/lib/db';
-import Vacancy from '@/lib/models/Vacancy';
+import dbConnect from "@/lib/db";
+import Vacancy from "@/lib/models/Vacancy";
+import { authorize } from "@/lib/authorize";
 
-export async function GET(request, { params }) {
-  await dbConnect();
-  const { id } = await params;
-
-  try {
-    const vacancy = await Vacancy.findById(id);
-
-    if (!vacancy) {
-      return Response.json({ error: 'Вакансію не знайдено' }, { status: 404 });
-    }
-
-    return Response.json(vacancy);
-  } catch (error) {
-    return Response.json({ error: 'Невалідний ID' }, { status: 400 });
-  }
-}
 
 export async function PUT(request, { params }) {
+  const { error } = await authorize("admin");
+  if (error) return error;
+
   await dbConnect();
   const { id } = await params;
-
   try {
-    const body = await request.json();
-    const vacancy = await Vacancy.findByIdAndUpdate(id, body, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!vacancy) {
-      return Response.json({ error: 'Вакансію не знайдено' }, { status: 404 });
-    }
-
+    const data = await request.json();
+    const vacancy = await Vacancy.findByIdAndUpdate(id, data, { new: true });
     return Response.json(vacancy);
-  } catch (error) {
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
-      return Response.json({ errors: messages }, { status: 400 });
-    }
-
-    return Response.json({ error: 'Помилка сервера' }, { status: 500 });
+  } catch (err) {
+    return Response.json({ error: "Помилка оновлення" }, { status: 400 });
   }
 }
 
+
 export async function DELETE(request, { params }) {
+  const { error } = await authorize("admin");
+  if (error) return error;
+
   await dbConnect();
   const { id } = await params;
-
   try {
-    const vacancy = await Vacancy.findByIdAndDelete(id);
-
-    if (!vacancy) {
-      return Response.json({ error: 'Вакансію не знайдено' }, { status: 404 });
-    }
-
-    return Response.json({ message: `Вакансію "${vacancy.title}" видалено` });
-  } catch (error) {
-    return Response.json({ error: 'Невалідний ID' }, { status: 400 });
+    await Vacancy.findByIdAndDelete(id);
+    return Response.json({ message: "Видалено" });
+  } catch (err) {
+    return Response.json({ error: "Помилка видалення" }, { status: 400 });
   }
 }

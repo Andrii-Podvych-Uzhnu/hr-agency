@@ -2,11 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react' 
 
 export default function VacanciesDashboardPage() {
   const [vacancies, setVacancies] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  
+  
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.role === 'admin'
 
   async function fetchVacancies() {
     try {
@@ -34,7 +39,9 @@ export default function VacanciesDashboardPage() {
         method: 'DELETE'
       })
       if (!response.ok) throw new Error('Помилка видалення')
-      setVacancies(prev => prev.filter(v => v.id !== id))
+      
+      
+      setVacancies(prev => prev.filter(v => (v.id || v._id) !== id))
     } catch (err) {
       alert(err.message)
     }
@@ -64,12 +71,16 @@ export default function VacanciesDashboardPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-10">
           <h1 className="text-3xl font-black text-slate-900">Вакансії ({vacancies.length})</h1>
-          <Link
-            href="/dashboard/vacancies/new"
-            className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg"
-          >
-            + Додати вакансію
-          </Link>
+          
+          
+          {isAdmin && (
+            <Link
+              href="/dashboard/vacancies/new"
+              className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg"
+            >
+              + Додати вакансію
+            </Link>
+          )}
         </div>
 
         <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-slate-100">
@@ -80,12 +91,13 @@ export default function VacanciesDashboardPage() {
                 <th className="px-8 py-5 text-left text-sm font-bold uppercase tracking-wider">Категорія</th>
                 <th className="px-8 py-5 text-left text-sm font-bold uppercase tracking-wider">Зарплата</th>
                 <th className="px-8 py-5 text-left text-sm font-bold uppercase tracking-wider">Статус</th>
-                <th className="px-8 py-5 text-right text-sm font-bold uppercase tracking-wider">Дії</th>
+                
+                {isAdmin && <th className="px-8 py-5 text-right text-sm font-bold uppercase tracking-wider">Дії</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {vacancies.map(vacancy => (
-                <tr key={vacancy.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={vacancy.id || vacancy._id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-8 py-5">
                     <div className="font-bold text-slate-900">{vacancy.title}</div>
                     <div className="text-slate-400 text-sm">{vacancy.company}</div>
@@ -105,14 +117,18 @@ export default function VacanciesDashboardPage() {
                       {vacancy.available ? 'Активна' : 'Закрита'}
                     </span>
                   </td>
-                  <td className="px-8 py-5 text-right">
-                    <button
-                      onClick={() => handleDelete(vacancy.id, vacancy.title)}
-                      className="text-red-500 hover:text-red-700 font-bold text-sm uppercase"
-                    >
-                      Видалити
-                    </button>
-                  </td>
+                  
+                  
+                  {isAdmin && (
+                    <td className="px-8 py-5 text-right">
+                      <button
+                        onClick={() => handleDelete(vacancy.id || vacancy._id, vacancy.title)}
+                        className="text-red-500 hover:text-red-700 font-bold text-sm uppercase"
+                      >
+                        Видалити
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
