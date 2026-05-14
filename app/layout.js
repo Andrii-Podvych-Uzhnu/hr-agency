@@ -10,18 +10,17 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="uk">
-      <body className="bg-slate-50 text-slate-900 font-sans flex flex-col min-h-screen">
+    <html lang="uk" className="h-full bg-white">
+      <body className="antialiased bg-white text-slate-900 font-sans flex flex-col min-h-screen m-0 p-0">
         <FavoritesProvider>
           
           <Header />
           
-       
-          <main className="flex-grow">
+          
+          <main className="flex-1 w-full bg-white relative">
             {children}
           </main>
           
-         
           <Footer />
 
         </FavoritesProvider>
