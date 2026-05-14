@@ -1,29 +1,32 @@
+import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import User from "@/lib/models/User";
 import { authorize } from "@/lib/authorize";
+import { updateRoleSchema } from "@/lib/validations/user";
 
 export async function PUT(request, { params }) {
- 
   const { session, error } = await authorize("admin");
   if (error) return error;
 
   await dbConnect();
-  const { id } = await params;
 
   try {
-    const { role } = await request.json();
+    const { id } = await params;
+    const data = await request.json();
 
-    
-    if (!["user", "admin"].includes(role)) {
-      return Response.json(
-        { error: "Роль має бути 'user' або 'admin'" },
+    const result = updateRoleSchema.safeParse(data);
+    if (!result.success) {
+      const messages = result.error.errors.map((e) => e.message);
+      return NextResponse.json(
+        { error: messages.join(", ") },
         { status: 400 }
       );
     }
 
-  
+    const { role } = result.data;
+
     if (id === session.user.id) {
-      return Response.json(
+      return NextResponse.json(
         { error: "Ви не можете змінити власну роль" },
         { status: 400 }
       );
@@ -36,14 +39,17 @@ export async function PUT(request, { params }) {
     ).select("-password");
 
     if (!user) {
-      return Response.json(
+      return NextResponse.json(
         { error: "Користувача не знайдено" },
         { status: 404 }
       );
     }
 
-    return Response.json(user);
-  } catch (err) {
-    return Response.json({ error: "Помилка сервера" }, { status: 500 });
+    return NextResponse.json(user);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Помилка сервера" },
+      { status: 500 }
+    );
   }
 }

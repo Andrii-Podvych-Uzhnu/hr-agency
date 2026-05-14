@@ -1,47 +1,49 @@
-import bcrypt from 'bcryptjs'
-import dbConnect from '@/lib/db'
-import User from '@/lib/models/User'
+import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import dbConnect from "@/lib/db";
+import User from "@/lib/models/User";
+import { registerSchema } from "@/lib/validations/user";
+ import { stripHtml } from "@/lib/sanitize"; // Буде створено на кроці 7
 
 export async function POST(request) {
   try {
-    const { name, email, password } = await request.json()
+    await dbConnect();
 
-    if (!name || !email || !password) {
-      return Response.json(
-        { error: "Всі поля обов'язкові" },
+    const data = await request.json();
+
+   
+    const result = registerSchema.safeParse(data);
+    if (!result.success) {
+      const messages = result.error.errors.map((e) => e.message);
+      return NextResponse.json(
+        { error: messages.join(", ") },
         { status: 400 }
-      )
+      );
     }
 
-    if (password.length < 6) {
-      return Response.json(
-        { error: 'Пароль має містити щонайменше 6 символів' },
-        { status: 400 }
-      )
-    }
+    const { email, password, name } = result.data;
+   
 
-    await dbConnect()
-
-    const existingUser = await User.findOne({ email })
-
+   
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return Response.json(
-        { error: 'Користувач з таким email вже існує' },
+      return NextResponse.json(
+        { error: "Користувач з таким email вже існує" },
         { status: 409 }
-      )
+      );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12)
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      name,
+      name, 
       email,
       password: hashedPassword,
-    })
+    });
 
-    return Response.json(
+    return NextResponse.json(
       {
-        message: 'Реєстрація успішна',
+        message: "Користувача успішно створено",
         user: {
           id: user._id,
           name: user.name,
@@ -50,19 +52,17 @@ export async function POST(request) {
         },
       },
       { status: 201 }
-    )
+    );
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((err) => err.message)
-      return Response.json(
-        { error: messages.join(', ') },
-        { status: 400 }
-      )
+    if (error.code === 11000) {
+      return NextResponse.json(
+        { error: "Користувач з таким email вже існує" },
+        { status: 409 }
+      );
     }
-
-    return Response.json(
-      { error: 'Помилка сервера' },
+    return NextResponse.json(
+      { error: "Помилка сервера" },
       { status: 500 }
-    )
+    );
   }
 }
