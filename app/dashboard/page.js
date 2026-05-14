@@ -9,7 +9,7 @@ export const metadata = {
 
 async function DashboardStats() {
   await new Promise(resolve => setTimeout(resolve, 1500))
-  const stats = getVacancyStats()
+  const stats = await getVacancyStats() 
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

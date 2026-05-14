@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation'
 export default function VacancyActions({ vacancyId, vacancyTitle }) {
   const router = useRouter()
 
+  const handleEdit = () => {
+    router.push(`/dashboard/vacancies/${vacancyId}/edit`)
+  }
+
   async function handleDelete() {
     if (!confirm(`Ви впевнені, що хочете видалити вакансію "${vacancyTitle}"?`)) return
 
@@ -17,9 +21,7 @@ export default function VacancyActions({ vacancyId, vacancyTitle }) {
         throw new Error('Помилка видалення')
       }
 
-      
       router.push('/dashboard/vacancies')
-      
       router.refresh()
     } catch (err) {
       alert(err.message)
@@ -28,6 +30,12 @@ export default function VacancyActions({ vacancyId, vacancyTitle }) {
 
   return (
     <div className="flex gap-4">
+      <button
+        onClick={handleEdit}
+        className="bg-indigo-500 text-white px-6 py-3 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-100"
+      >
+        Редагувати
+      </button>
       <button
         onClick={handleDelete}
         className="bg-red-500 text-white px-6 py-3 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-red-600 transition-all shadow-lg shadow-red-100"
