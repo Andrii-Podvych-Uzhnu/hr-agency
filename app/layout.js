@@ -1,5 +1,6 @@
 import "./globals.css";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import AuthProvider from "@/components/AuthProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer"; 
 
@@ -10,21 +11,23 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="uk">
-      <body className="bg-slate-50 text-slate-900 font-sans flex flex-col min-h-screen">
-        <FavoritesProvider>
-          
-          <Header />
-          
-       
-          <main className="flex-grow">
-            {children}
-          </main>
-          
-         
-          <Footer />
+    <html lang="uk" className="h-full">
+     
+      <body className="antialiased bg-white text-slate-900 font-sans flex flex-col min-h-screen">
+        <AuthProvider>
+          <FavoritesProvider>
+            
+            <Header />
+            
+            
+            <main className="flex-1 w-full bg-white">
+              {children}
+            </main>
+            
+            <Footer />
 
-        </FavoritesProvider>
+          </FavoritesProvider>
+        </AuthProvider>
       </body>
     </html>
   );
