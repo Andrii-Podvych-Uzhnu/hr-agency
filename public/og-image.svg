@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)" />
+
+  <circle cx="1000" cy="150" r="300" fill="#db2777" opacity="0.15" filter="blur(90px)" />
+  <circle cx="200" cy="480" r="250" fill="#06b6d4" opacity="0.15" filter="blur(80px)" />
+
+  <path d="M 0,100 L 1200,100 M 0,530 L 1200,530" stroke="#334155" stroke-width="1" stroke-dasharray="10,10" />
+
+  <text x="600" y="310" font-family="system-ui, -apple-system, sans-serif" font-size="125" font-weight="950" fill="url(#textGrad)" text-anchor="middle" letter-spacing="-3">HR.agency</text>
+  
+  <text x="600" y="415" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#94a3b8" text-anchor="middle" letter-spacing="6">ТАЛАНТИ • ВАКАНСІЇ • ПРАВДИВІ ВІДГУКИ</text>
+</svg>

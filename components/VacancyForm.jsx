@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
-import { vacancySchema } from "@/lib/validations/vacancy";
+import { createVacancySchema } from "@/lib/validations/vacancy"; 
 import FormField from "@/components/forms/FormField";
 
 const CATEGORIES = ["IT", "Security", "HR", "Management"];
@@ -20,7 +20,7 @@ export default function VacancyForm({ mode = "create", initialData, vacancyId })
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(vacancySchema),
+    resolver: zodResolver(createVacancySchema), 
     defaultValues: {
       title: initialData?.title ?? "",
       company: initialData?.company ?? "",

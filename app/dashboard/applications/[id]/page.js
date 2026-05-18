@@ -1,7 +1,7 @@
-import { notFound, redirect } from 'next-auth/next'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import dbConnect from '@/lib/db'
 import Application from '@/lib/models/Application'
 import ApplicationItem from '@/lib/models/ApplicationItem'
@@ -9,7 +9,6 @@ import Vacancy from '@/lib/models/Vacancy'
 import User from '@/lib/models/User'
 import ApplicationStatusBadge from '@/components/ApplicationStatusBadge'
 import ApplicationActions from '@/components/ApplicationActions'
-
 
 void [Vacancy, User, ApplicationItem]
 
@@ -29,7 +28,9 @@ export default async function ApplicationDetailsPage({ params }) {
         populate: { path: 'vacancy', select: 'title company category' },
       })
       .lean()
-  } catch { notFound() }
+  } catch { 
+    notFound() 
+  }
 
   if (!app) notFound()
 

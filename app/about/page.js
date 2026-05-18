@@ -1,5 +1,11 @@
 import Link from 'next/link';
 
+
+export const metadata = {
+  title: "Про платформу",
+  description: "Дізнайтеся більше про місію HR.agency, наші цінності та принципи прозорого та чесного IT-рекрутингу.",
+};
+
 export default function About() {
   return (
     <div className="bg-white">
@@ -10,7 +16,7 @@ export default function About() {
               Ми змінюємо підхід до найму та пошуку роботи
             </h1>
             <p className="text-xl text-gray-600 leading-relaxed">
-              HR-Agency — це екосистема, де професіонали знаходять своє покликання, 
+              HR.agency — це екосистема, де професіонали знаходять своє покликання, 
               а компанії — лідерів, які рухають бізнес вперед. Ми віримо в прозорість, 
               чесність та силу правильного вибору.
             </p>
@@ -54,7 +60,8 @@ export default function About() {
         <section className="py-20 bg-indigo-900 text-white text-center">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold mb-8">Готові зробити наступний крок?</h2>
-            <Link href="/vacancies" className="bg-white text-indigo-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg">
+            {/* Виправлено шлях до вакансій */}
+            <Link href="/dashboard/vacancies" className="bg-white text-indigo-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg">
               Переглянути вакансії
             </Link>
           </div>

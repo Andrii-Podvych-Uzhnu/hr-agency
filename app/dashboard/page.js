@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import StatsCard from "@/components/StatsCard";
 import { getVacancyStats, getApplicationStats } from "@/lib/helpers";
 
@@ -11,7 +11,6 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   const isAdmin = session?.user?.role === "admin";
 
-  
   const [vacancyStats, appStats] = await Promise.all([
     getVacancyStats(),
     isAdmin ? getApplicationStats() : Promise.resolve(null),
@@ -28,7 +27,6 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      
       <section>
         <div className="flex items-center gap-3 mb-6">
           <div className="w-2 h-8 bg-indigo-600 rounded-full"></div>
@@ -69,7 +67,6 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-     
       {isAdmin && appStats && (
         <section className="pt-6 border-t border-slate-200">
           <div className="flex items-center gap-3 mb-6">

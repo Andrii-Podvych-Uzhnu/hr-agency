@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 const BriefcaseIcon = () => (
@@ -20,35 +21,53 @@ const ChartIcon = () => (
 
 export default function Home() {
   return (
-    <div className="font-sans">
+    <div className="font-sans min-h-screen bg-slate-50">
       <main>
-        <section className="bg-white py-20 md:py-32 border-b border-slate-100">
-          <div className="container mx-auto px-6 text-center max-w-4xl">
-            <div className="inline-flex items-center bg-indigo-50 text-indigo-700 text-xs px-4 py-1.5 rounded-full font-medium mb-8">
+        
+        <section className="relative h-[560px] flex items-center justify-center overflow-hidden">
+          <Image
+            src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80"
+            alt="Сучасний офіс IT-рекрутингу"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+          {/* Фірмовий темний градієнт-overlay для читабельності */}
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-950/90 to-slate-900/75" />
+
+          <div className="relative container mx-auto px-6 text-center max-w-4xl z-10 text-white">
+            <div className="inline-flex items-center bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-xs px-4 py-1.5 rounded-full font-medium mb-8 backdrop-blur-sm">
               <span className="relative flex h-2 w-2 mr-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-400"></span>
               </span>
               Платформа №1 для IT-рекрутингу
             </div>
-            <h1 className="text-5xl md:text-7xl font-extrabold text-slate-950 leading-tight tracking-tighter mb-8">
+            
+            <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tighter mb-8">
               HR: Вакансії та<br />
-              <span className="bg-gradient-to-r from-indigo-500 to-blue-600 bg-clip-text text-transparent italic text-6xl">Правдиві Відгуки</span>
+              <span className="bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent italic text-5xl md:text-6xl">
+                Правдиві Відгуки
+              </span>
             </h1>
-            <p className="text-xl text-slate-600 leading-relaxed mb-12 max-w-2xl mx-auto">
+            
+            <p className="text-xl text-slate-300 leading-relaxed mb-12 max-w-2xl mx-auto">
               Ми поєднуємо таланти з ідеальними роботодавцями через прозорість та глибоку аналітику ринку.
             </p>
+            
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/vacancies" className="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 transition shadow-xl shadow-indigo-100">
+              <Link href="/dashboard/vacancies" className="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-indigo-700 transition shadow-xl shadow-indigo-900/40">
                 Знайти роботу
               </Link>
-              <Link href="/candidates" className="bg-white text-slate-950 border border-slate-200 px-10 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 transition shadow-sm">
-                Наші кандидати
+              <Link href="/dashboard" className="bg-white/10 text-white border border-white/20 px-10 py-4 rounded-2xl font-bold text-lg hover:bg-white/20 transition backdrop-blur-sm">
+                Панель керування
               </Link>
             </div>
           </div>
         </section>
 
+        {/* Секція переваг */}
         <section className="py-24 bg-slate-50">
           <div className="container mx-auto px-6">
             <h2 className="text-4xl font-bold text-slate-950 text-center mb-16 tracking-tight">
@@ -61,9 +80,10 @@ export default function Home() {
                 </div>
                 <h3 className="text-2xl font-bold mb-4 text-slate-900 tracking-tight">Актуальні вакансії</h3>
                 <p className="text-slate-600 leading-relaxed">
-                  Тільки перевірені пропозиції від топових IT-компаній. Ми фільтруємо спам та застарілі оголошення.
+                  Тільки перевірені пропозиції від топових IT-компаній. Мы фільтруємо спам та застарілі оголошення.
                 </p>
               </div>
+              
               <div className="bg-white rounded-3xl p-10 shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 md:translate-y-4">
                 <div className="bg-indigo-50 h-14 w-14 rounded-2xl flex items-center justify-center mb-8">
                   <ChatIcon />
@@ -73,6 +93,7 @@ export default function Home() {
                   Дізнайтеся реальний стан справ у компанії від діючих співробітників. Жодної цензури від роботодавців.
                 </p>
               </div>
+              
               <div className="bg-white rounded-3xl p-10 shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                 <div className="bg-indigo-50 h-14 w-14 rounded-2xl flex items-center justify-center mb-8">
                   <ChartIcon />
