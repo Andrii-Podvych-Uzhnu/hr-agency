@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs"; 
 import dbConnect from "@/lib/db";
 import User from "@/lib/models/User";
 import { registerSchema } from "@/lib/validations/user";
- import { stripHtml } from "@/lib/sanitize"; // Буде створено на кроці 7
 
 export async function POST(request) {
   try {
@@ -11,7 +10,6 @@ export async function POST(request) {
 
     const data = await request.json();
 
-   
     const result = registerSchema.safeParse(data);
     if (!result.success) {
       const messages = result.error.errors.map((e) => e.message);
@@ -22,9 +20,7 @@ export async function POST(request) {
     }
 
     const { email, password, name } = result.data;
-   
-
-   
+    
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
@@ -54,6 +50,7 @@ export async function POST(request) {
       { status: 201 }
     );
   } catch (error) {
+    console.error("Помилка реєстрації:", error); 
     if (error.code === 11000) {
       return NextResponse.json(
         { error: "Користувач з таким email вже існує" },

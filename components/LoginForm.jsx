@@ -42,11 +42,11 @@ export default function LoginForm() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <FormField label="Email" error={errors.email?.message}>
             <input type="email" autoComplete="email" {...register("email")}
-              className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+              className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-900 bg-white placeholder:text-slate-400" />
           </FormField>
           <FormField label="Пароль" error={errors.password?.message}>
             <input type="password" autoComplete="current-password" {...register("password")}
-              className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+              className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-900 bg-white placeholder:text-slate-400" />
           </FormField>
           <button type="submit" disabled={isSubmitting}
             className="w-full bg-indigo-600 text-white py-3 px-4 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-lg shadow-indigo-100">
@@ -54,7 +54,7 @@ export default function LoginForm() {
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-slate-500">
-          Немає акаунту? <Link href="/register" className="text-indigo-600 font-bold hover:underline">Зареєструватися</Link>
+          Немає акаунту? <Link href="/auth/register" className="text-indigo-600 font-bold hover:underline">Зареєструватися</Link>
         </p>
       </div>
     </div>

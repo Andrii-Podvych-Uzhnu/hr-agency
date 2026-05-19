@@ -43,7 +43,7 @@ export default function RegisterForm() {
 
       if (signInResult?.error) {
         toast.warning("Акаунт створено, тепер увійдіть");
-        router.push("/login");
+        router.push("/auth/login");
         return;
       }
 
@@ -61,24 +61,28 @@ export default function RegisterForm() {
         <h1 className="text-2xl font-black text-center mb-6 text-slate-900">Реєстрація</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <FormField label="Ім'я" error={errors.name?.message}>
-            <input type="text" {...register("name")} className="w-full px-4 py-2 border rounded-xl" />
+            <input type="text" {...register("name")} 
+              className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-900 bg-white placeholder:text-slate-400" />
           </FormField>
           <FormField label="Email" error={errors.email?.message}>
-            <input type="email" {...register("email")} className="w-full px-4 py-2 border rounded-xl" />
+            <input type="email" {...register("email")} 
+              className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-900 bg-white placeholder:text-slate-400" />
           </FormField>
           <FormField label="Пароль" error={errors.password?.message}>
-            <input type="password" autoComplete="new-password" {...register("password")} className="w-full px-4 py-2 border rounded-xl" />
+            <input type="password" autoComplete="new-password" {...register("password")} 
+              className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-900 bg-white placeholder:text-slate-400" />
           </FormField>
           <FormField label="Підтвердження пароля" error={errors.confirmPassword?.message}>
-            <input type="password" autoComplete="new-password" {...register("confirmPassword")} className="w-full px-4 py-2 border rounded-xl" />
+            <input type="password" autoComplete="new-password" {...register("confirmPassword")} 
+              className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-900 bg-white placeholder:text-slate-400" />
           </FormField>
           <button type="submit" disabled={isSubmitting}
-            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50 shadow-lg shadow-indigo-100">
+            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-lg shadow-indigo-100">
             {isSubmitting ? "Реєстрація..." : "Зареєструватися"}
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-slate-500">
-          Вже маєте акаунт? <Link href="/login" className="text-indigo-600 font-bold hover:underline">Увійти</Link>
+          Вже маєте акаунт? <Link href="/auth/login" className="text-indigo-600 font-bold hover:underline">Увійти</Link>
         </p>
       </div>
     </div>
