@@ -24,7 +24,7 @@ export default function LoginForm() {
       const result = await signIn("credentials", { ...data, redirect: false });
       
       if (result?.error) {
-        // ВИВОДИМО РЕАЛЬНИЙ СИСТЕМНИЙ КОД ПОМИЛКИ
+        
         console.error("NextAuth Error:", result.error);
         setError("password", { type: "server", message: `Помилка сервера: ${result.error}` });
         toast.error(`Помилка: ${result.error}`);
