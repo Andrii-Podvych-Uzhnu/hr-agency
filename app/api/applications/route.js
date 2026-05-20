@@ -7,7 +7,6 @@ import { authorize } from "@/lib/authorize";
 import { createApplicationSchema } from "@/lib/validations/application";
 import { sanitizeObject } from "@/lib/sanitize";
 
-
 void [User, Vacancy, ApplicationItem];
 
 export async function GET(request) {
@@ -23,19 +22,29 @@ export async function GET(request) {
   const filter = session.user.role === "admin" ? {} : { user: session.user.id };
   if (status) filter.status = status;
 
-  
   if (vacancyId) {
     const appIds = await ApplicationItem.find({ vacancy: vacancyId }).distinct("application");
     filter._id = { $in: appIds };
   }
 
-  const applications = await Application.find(filter)
+  
+  const rawApplications = await Application.find(filter)
     .populate({ path: "user", select: "name email role" })
-    .populate({
-      path: "items",
-      populate: { path: "vacancy", select: "title company category salary" },
-    })
     .sort({ createdAt: -1 });
+
+  
+  const applications = await Promise.all(
+    rawApplications.map(async (app) => {
+      const items = await ApplicationItem.find({ application: app._id })
+        .populate({ path: "vacancy", select: "title company category salary" });
+      
+      const appObj = app.toObject();
+      return {
+        ...appObj,
+        items: items || [] 
+      };
+    })
+  );
 
   return Response.json(applications);
 }
@@ -56,7 +65,6 @@ export async function POST(request) {
 
     const sanitized = sanitizeObject(result.data);
 
-    
     let appUserId = session.user.id;
     if (session.user.role === "admin" && sanitized.user) {
       const target = await User.findById(sanitized.user);
@@ -64,7 +72,6 @@ export async function POST(request) {
       appUserId = target._id;
     }
 
-    
     const vIds = sanitized.items.map(i => i.vacancy);
     const dbVacancies = await Vacancy.find({ _id: { $in: vIds } });
     const vMap = new Map(dbVacancies.map(v => [v._id.toString(), v]));
@@ -76,14 +83,12 @@ export async function POST(request) {
       }
     }
 
-    
     const application = await Application.create({
       user: appUserId,
       notes: sanitized.notes
     });
     createdAppId = application._id;
 
-    
     const itemsToCreate = sanitized.items.map(item => ({
       application: application._id,
       vacancy: item.vacancy,
@@ -92,9 +97,10 @@ export async function POST(request) {
     }));
     await ApplicationItem.insertMany(itemsToCreate);
 
-    const populated = await Application.findById(application._id)
-      .populate({ path: "user", select: "name email" })
-      .populate({ path: "items", populate: { path: "vacancy" } });
+   
+    const createdItems = await ApplicationItem.find({ application: application._id }).populate("vacancy");
+    const populated = application.toObject();
+    populated.items = createdItems;
 
     return Response.json(populated, { status: 201 });
 

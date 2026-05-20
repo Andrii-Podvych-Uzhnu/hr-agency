@@ -1,33 +1,61 @@
 import { Suspense } from 'react'
-import { vacancies } from '@/lib/data'
+import dbConnect from '@/lib/db'
+import Vacancy from '@/lib/models/Vacancy'
 import VacancyCard from '@/components/VacancyCard'
 import { PostSkeleton } from '@/components/skeletons/PostSkeleton'
 
-async function VacancyList({ query }) {
-  await new Promise(resolve => setTimeout(resolve, 1500))
-  
-  const filtered = query 
-    ? vacancies.filter(v => 
-        v.title.toLowerCase().includes(query.toLowerCase()) || 
-        v.company.toLowerCase().includes(query.toLowerCase())
-      )
-    : vacancies
+export const dynamic = "force-dynamic";
 
-  if (filtered.length === 0) {
+async function VacancyList({ query }) {
+  try {
+    await dbConnect()
+
+  
+    const mongoQuery = query 
+      ? {
+          available: true, 
+          $or: [
+            { title: { $regex: query, $options: 'i' } },    
+            { company: { $regex: query, $options: 'i' } }
+          ]
+        }
+      : { available: true };
+
+    
+    const filtered = await Vacancy.find(mongoQuery).sort({ createdAt: -1 })
+
+    if (filtered.length === 0) {
+      return (
+        <div className="bg-slate-50 border border-slate-100 rounded-[2rem] p-12 text-center">
+          <p className="text-slate-500 font-bold text-lg">Нічого не знайдено за запитом "{query}"</p>
+        </div>
+      )
+    }
+
     return (
-      <div className="bg-slate-50 border border-slate-100 rounded-[2rem] p-12 text-center">
-        <p className="text-slate-500 font-bold text-lg">Нічого не знайдено за запитом "{query}"</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filtered.map(v => {
+         
+          const vacancyData = {
+            id: v._id.toString(),
+            title: v.title,
+            company: v.company,
+            category: v.category,
+            salary: v.salary,
+            available: v.available
+          }
+          return <VacancyCard key={vacancyData.id} {...vacancyData} />
+        })}
+      </div>
+    )
+  } catch (error) {
+    console.error("Помилка завантаження публічних вакансій:", error)
+    return (
+      <div className="bg-red-50 border border-red-100 rounded-[2rem] p-12 text-center">
+        <p className="text-red-600 font-bold text-lg">Не вдалося завантажити вакансії. Спробуйте пізніше.</p>
       </div>
     )
   }
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {filtered.map(v => (
-        <VacancyCard key={v.id} {...v} />
-      ))}
-    </div>
-  )
 }
 
 export default async function VacanciesPage({ searchParams }) {
@@ -46,7 +74,7 @@ export default async function VacanciesPage({ searchParams }) {
               name="q" 
               defaultValue={query}
               placeholder="Пошук за посадою або компанією..." 
-              className="w-full px-6 py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 shadow-sm font-medium text-slate-900 pr-32"
+              className="w-full px-6 py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 shadow-sm font-medium text-slate-900 pr-32 bg-white"
             />
             <button 
               type="submit" 

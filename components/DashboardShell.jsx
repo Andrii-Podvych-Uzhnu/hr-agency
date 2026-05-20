@@ -30,7 +30,7 @@ export default function DashboardShell({ children }) {
               💼 Пошук вакансій
             </Link>
 
-            {/* Адмін-панель */}
+           
             {isAdmin && (
               <div className="pt-4 mt-4 border-t border-slate-800 space-y-2">
                 <p className="px-4 text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Адміністрування</p>
