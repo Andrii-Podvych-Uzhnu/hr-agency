@@ -22,15 +22,19 @@ export default function LoginForm() {
   const onSubmit = async (data) => {
     try {
       const result = await signIn("credentials", { ...data, redirect: false });
+      
       if (result?.error) {
-        setError("password", { type: "server", message: "Невірний email або пароль" });
-        toast.error("Не вдалося увійти");
+        // ВИВОДИМО РЕАЛЬНИЙ СИСТЕМНИЙ КОД ПОМИЛКИ
+        console.error("NextAuth Error:", result.error);
+        setError("password", { type: "server", message: `Помилка сервера: ${result.error}` });
+        toast.error(`Помилка: ${result.error}`);
         return;
       }
+      
       toast.success("Вітаємо в HR.agency!");
       router.push("/dashboard");
       router.refresh();
-    } catch {
+    } catch (err) {
       toast.error("Помилка при вході");
     }
   };
