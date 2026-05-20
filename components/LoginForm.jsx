@@ -3,14 +3,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import { loginSchema } from "@/lib/validations/auth";
 import FormField from "@/components/forms/FormField";
 
 export default function LoginForm() {
-  const router = useRouter();
   const {
     register, handleSubmit, setError,
     formState: { errors, isSubmitting },
@@ -21,19 +19,20 @@ export default function LoginForm() {
 
   const onSubmit = async (data) => {
     try {
-      const result = await signIn("credentials", { ...data, redirect: false });
+    
+      const result = await signIn("credentials", { 
+        ...data, 
+        callbackUrl: "/dashboard",
+        redirect: true 
+      });
       
+     
       if (result?.error) {
-        
         console.error("NextAuth Error:", result.error);
-        setError("password", { type: "server", message: `Помилка сервера: ${result.error}` });
-        toast.error(`Помилка: ${result.error}`);
-        return;
+        setError("password", { type: "server", message: "Невірний email або пароль" });
+        toast.error("Не вдалося увійти");
       }
       
-      toast.success("Вітаємо в HR.agency!");
-      router.push("/dashboard");
-      router.refresh();
     } catch (err) {
       toast.error("Помилка при вході");
     }
